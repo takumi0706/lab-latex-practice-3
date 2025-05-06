@@ -7,7 +7,7 @@
 \LoadClass[
     twocolumn,
     paper=a4,
-    fontsize=9pt,
+    fontsize=11pt,
     disablejfam,
     head_space=20mm,
     foot_space=20mm,
@@ -79,7 +79,16 @@
 
 % \RequirePackage{enumitem} % 高機能番号付き箇条書きのパッケージ
 \RequirePackage{tabularx} % 表の幅を指定するためのパッケージ
-\RequirePackage[bibstyle=bibliography,sorting=none,date=year,isbn=false,doi,giveninits,urldate=iso,seconds]{biblatex} % biblatexを使用するためのパッケージ
+\RequirePackage[bibstyle=bibliography,
+                sorting=none,
+                isbn=false,
+                doi,
+                giveninits=false,
+                uniquename=full,
+                useprefix=true,
+                urldate=iso,
+                seconds
+]{biblatex} % biblatexを使用するためのパッケージ
 \addbibresource{references.bib}
 
 %ページ数の書式
@@ -96,7 +105,7 @@
 \captionsetup[figure]{labelsep=quad, labelformat=simple, name=\bfseries Fig., skip=5pt, font={stretch=0.8}, belowskip=0pt}
 \captionsetup[subfigure]{labelsep=space, labelformat=simple, name=\bfseries Fig., skip=3pt, font={stretch=0.8}, belowskip=0pt}
 \renewcommand*{\thesubfigure}{(\alph{subfigure})}
-\captionsetup[table]{labelsep=quad, labelformat=simple, name=\bfseries Table, skip=5pt, font={stretch=0.8}, belowskip=0pt}
+\captionsetup[table]{labelsep=colon, labelformat=simple, name=表, skip=5pt, font={stretch=0.8}, belowskip=0pt}
 
 % 本文中のFigureとTableの表記統一のため，\Fig・\Tableを定義
 % 引数としてlabelを受け取り，それを使ってFigureやTableを参照する
@@ -131,13 +140,13 @@
 }
 
 % sectionのサイズを合わせる
-\RenewBlockHeading{section}{1}{font={\normalsize\bfseries},after_label_space=0\jlreq@zw}
-\RenewBlockHeading{subsection}{2}{font={\normalsize\bfseries},after_label_space=0\jlreq@zw}
+\RenewBlockHeading{section}{1}{font={\Large\bfseries},after_label_space=0\jlreq@zw}
+\RenewBlockHeading{subsection}{2}{font={\large\bfseries},after_label_space=0\jlreq@zw}
 \RenewBlockHeading{subsubsection}{3}{font={\normalsize\bfseries},after_label_space=0\jlreq@zw}
 
 % セクション類の空白の設定
-\ModifyHeading{section}{before_space=5pt, after_space=5pt}
-\ModifyHeading{subsection}{before_space=5pt, after_space=5pt}
+\ModifyHeading{section}{before_space=15pt, after_space=15pt}
+\ModifyHeading{subsection}{before_space=15pt, after_space=15pt}
 \ModifyHeading{subsubsection}{before_space=5pt, after_space=5pt}
 % セクションタイトルが一行以下なら下、２行以上なら上
 % \ModifyHeading{section}{lines=1}
@@ -166,3 +175,75 @@
 }
 \normalsize
 \makeatother
+
+% fancyhdr を使ってページ上部に横線を設定
+\RequirePackage{fancyhdr}
+\AtBeginDocument{%
+  % デフォルトページスタイルを fancy に
+  \pagestyle{fancy}%
+  % ヘッダ／フッタをクリア
+  \fancyhf{}%
+  % ヘッダルールの太さ
+  \renewcommand{\headrulewidth}{1pt}%
+  % フッタルール不要
+  \renewcommand{\footrulewidth}{0pt}%
+  \fancypagestyle{plain}{%
+    \fancyhf{}%
+    \renewcommand{\headrulewidth}{1pt}%
+    \renewcommand{\footrulewidth}{0pt}%
+  }%
+}
+
+\newtheorem{theorem}{定理} % 定理環境
+\newtheorem{lemma}{補題} 
+
+
+% 著者名のフォント設定（普通のフォントに）
+\renewcommand*{\mkbibnamefamily}[1]{\textup{#1}}
+\renewcommand*{\mkbibnamegiven}[1]{\textup{#1}}
+
+% タイトルのフォーマット（普通のフォントに）
+\DeclareFieldFormat[article,inbook,incollection,inproceedings,patent,thesis,unpublished]{title}{#1}
+
+% ジャーナル名をイタリックに
+\DeclareFieldFormat{journaltitle}{\textit{#1}}
+
+% エントリ間のスペース調整
+\setlength{\bibitemsep}{0.5em}
+\setlength{\bibparsep}{0pt}
+
+% ボリュームに「Vol.」を追加
+\DeclareFieldFormat[article,periodical]{volume}{Vol.~#1}
+
+% ナンバーに「No.」を追加
+\DeclareFieldFormat[article,periodical]{number}{No.~#1}
+
+% 参考文献の句読点スタイルを調整
+
+% 基本の区切り文字をドット+スペースに設定
+\renewcommand*{\newunitpunct}{.\space}
+
+% ジャーナルタイトル以降の区切り文字を読点+スペースに変更
+\renewbibmacro*{journal+issuetitle}{%
+  \usebibmacro{journal}%
+  \setunit*{，\space}% ジャーナル名の後は読点
+  \iffieldundef{series}
+    {}
+    {\newunit
+     \printfield{series}%
+     \setunit{\addspace}}%
+  \usebibmacro{volume+number+eid}%
+  \setunit{，\space}% 巻・号の後は読点
+  \usebibmacro{issue+date}%
+  \setunit{\addcolon\space}%
+  \usebibmacro{issue}%
+  \newunit
+}
+
+% ページ番号と年の間も読点に
+\DeclareFieldFormat[article,inbook,incollection,inproceedings]{pages}{pp.~#1\addcomma}
+
+% 出力の調整
+\AtEveryBibitem{%
+  \csappto{blx@bbx@\thefield{entrytype}}{\setunit{，\space}}%
+}

@@ -1,22 +1,150 @@
-\documentclass{classes/report}
+\documentclass{classes/resume}
+
+\title{
+    \vspace{40pt}
+    \LARGE
+    二次元格子型無線ネットワークにおける\\
+    エネルギー最小ブロードキャストに関する研究\\
+    \Large Energy-Minimal Broadcast in Two-Dimensional Grid Wireless Networks
+}
+
+\author{
+	\large 電子情報工学専攻　村田敦史
+}
 
 \begin{document}
+\maketitle
 
-\pagenumbering{roman}
-\subfile{sections/title}
-\newpage
+\section{はじめに}
+近年，無線アドホックネットワークは戦場や災害時における情報共有手段などの用途のため注目されている．無線アドホックネットワークでは通信インフラ設備は設置されず，各無線ノードに送信電力を割り当てることで自律的に通信が確立される．最も一般的な無線通信モデルにおいて，送信ノード$s$が受信ノード$t$に正しくデータを送信するために必要な電力$P_{s}$は，$P_{s} \ge d(s,t)^{\alpha}$を満たすことが知られている．ここで，$d(s,t)$はノード$s$とノード$t$の間のユーグリッド距離，$\alpha$は通信環境に依存する$1$以上$6$以下の実定数である．\\
+\indent
+ネットワークにおいて典型的な通信パターンであるブロードキャストを，無線アドホックネットワークにおいて最小のエネルギー消費で実現することは重要な問題であある．ここで問題となるのは，どのようにしてエネルギー消費最小のブロードキャスト経路を得るかということである．このような問題は\textbf{エネルギー最小ブロードキャスト(MEB)問題}と呼ばれ，盛んに研究されている．
 
-\tableofcontents
-\clearpage
+\subsection{過去の結果と本研究の結果}
+$d$次元ユークリッド空間上で定義される点集合に対して，辺の重みが端点の距離の$\alpha$乗で与えられるような完全なグラフのクラスを$N_{d}^{\alpha}$で表す．入力を$N_{d}^{\alpha}$に属するグラフに制限したMEB問題は\textbf{MEB$[N_{d}^{\alpha}]$問題}と呼ばれる．表\ref{tab:complexity}にMEB$(N_{d}^{\alpha})$問題についての結果を示す．Calamoneri，Clementi，Ianni，Lauria，Monti，Silvestri \cite{ref:calamoneri2008}は入力を$N_{2}^{2}$に属する$n$点正方格子型ネットワークに制限することで，最適解のコストの下界が$\frac{n}{\pi} - O(\sqrt{n})$ ，上界が$\frac{1.01013n}{\pi} + O(\sqrt{n})$であることを示した．\\
+\indent
+本研究では，入力を$N_{2}^{2}$に属する$n$点正方格子型ネットワークに制限したMEB問題に対して，コストが$\frac{n}{\pi} + O(n^{0.83})$である解を出力する多項式時間アルゴリズムを示し，Calamoneriら\cite{ref:calamoneri2008}の示した最適解のコストの下界と上階の開きを埋めた．また，入力を$N_{2}^{\alpha}(\alpha \ge 2)$に属する$(k,l)$-格子型ネットワークに制限したMEB問題に対して，グラフの点数を$n = kl$とすると，最適解のコストの上界が$\frac{n}{3} + k + \frac{1}{3} - 1$であること，また$\alpha = 2$，$k \leq 10(k \ll l)$である時，下界が$\frac{n}{3} - O(\sqrt{n})$であることを示した．\\
 
-\pagenumbering{arabic}
+\begin{table}[htbp]
+    \centering
+    \caption{$d$と$\alpha$に基づくMEB$[N_{d}^{\alpha}]$問題の計算複雑度}
+    \begin{tabular}{|c||c|c|}
+        \hline
+        & $d = 1$ & $d = 2$ \\
+        \hline\hline
+        $\alpha = 1$ & $\in$ P (folklore) & $\in$ P (folklore) \\
+        \hline
+        $\alpha \geq 2$ & $\in$ P ([3]) & \begin{tabular}{@{}c@{}} NP-hard ([2]) \\ 6-APX ([4][5]) \end{tabular} \\
+        \hline
+    \end{tabular}
+    \label{tab:complexity}
+\end{table}
 
-\subfile{sections/abstract}
-\newpage
+\section{準備}
+\subsection{ネットワーク}
 
-\subfile{sections/main_issue}
-\newpage
+\[
+  \{\, (i,j)\in\mathbb{N}^2 \mid i\le k \land j\le l\,\}
+\]
 
-\subfile{sections/references}
+\[
+  \omega\bigl((i_0,j_0),(i_1,j_1)\bigr)
+  = \left\{(i_0 - i_1)^2 + (j_0 - j_1)^2\right\}^{\alpha/2}
+\]
 
+\subsection{MEB問題}
+
+\[
+  E' \;=\; \bigcup_{u\in V}\bigl\{\, (u,v)\in E \mid w(u,v)\le r(u)\bigr\}
+\]
+
+\section{$n$点正方格子型ネットワークにおけるMEB問題}
+
+\begin{align*}
+    \operatorname{cost}(r_{\mathrm{ACP}})
+    &\le \sum_{c}\Bigl(r + 1 + \tfrac{3\sqrt{2}}{2}\Bigr)^{2}
+       + \sum_{c}(2r + 3\sqrt{2})
+       + \sqrt{n} + 1
+    \\[0.5ex]
+    &\le \sum_{c}r^{2}
+       + \Bigl(\tfrac{19}{2} + 9\sqrt{2}\Bigr)\sum_{c}r
+       + \sqrt{n} + 1
+    \\[0.5ex]
+    &\le \frac{n}{\pi}
+       + \Bigl(\tfrac{19}{2} + 9\sqrt{2}\Bigr)\sum_{c}r
+       + \sqrt{n} + 1.
+\end{align*}
+
+\[
+\begin{aligned}
+  \sum_{c}r
+  &= r_{1} + 4\sum_{i\ge2}r_{i}
+       + 8\sum_{j\ge i}\sum_{r\in S_{j}}r \\ 
+  &\le 4\sum_{i\ge1}r_{i}
+       + 8\sum_{j\ge i}\sum_{r\in S_{j}}r \\ 
+  &\le 4\sqrt{2}\,\bigl\lceil\tfrac{m-1}{2}\bigr\rceil
+       + 8\sum_{j\ge i}\sum_{r\in S_{j}}r \\ 
+  &\le 8 \,\cdot\, \frac{\sum_{r\in S_{j}}r}{1 - (\sqrt{2}-1)^{2}}
+       + 4\sqrt{2}\,\bigl\lceil\tfrac{m-1}{2}\bigr\rceil \\ 
+  &\le 4(\sqrt{2}+1)\sum_{r\in S_{i}}r
+       + 2\sqrt{2}\,(\sqrt{n} + 1).
+\end{aligned}
+\]
+
+\[
+\frac{\sum_{r \in S_1} r}{n^{\beta}} = \frac{\sum_{r \in S_1, r \geq n^{\alpha}} r}{n^{\beta}} + \frac{\sum_{r \in S_1, r < n^{\alpha}} r}{n^{\beta}}.
+\]
+
+\[
+\begin{aligned}
+\frac{\sum_{r \in S_1, r \geq n^{\alpha}} r}{n^{\beta}}
+&= \frac{\sum_{r \in S_1, r \geq n^{\alpha}} r}{n \cdot n^{\beta - 1}} \\
+&\le \frac{\sum_{r \in S_1, r \geq n^{\alpha}} r}{n \cdot n^{\beta - 1}\sum_{C}r^2} \\
+&\le \frac{\sum_{r \in S_1, r \geq n^{\alpha}} r}{n^{\beta - 1} \cdot n_\alpha \sum_{r \in S_1, r \geq n_\alpha} r} \\
+&= \frac{1}{n_{\alpha + \beta -1}} \\
+&= \frac{1}{n_{0.0013665}}.
+\end{aligned}
+\]
+
+\[
+\begin{aligned}
+\frac{\sum_{r \in S_1, r \le n^\alpha}r}{n^\beta} &\le \frac{n^\alpha \sum_{r \in S_1, r \le n^\alpha} 1}{n^\beta} \\
+&\leq n^{\alpha + \beta} |S_1|.
+\end{aligned}
+\]
+
+\[
+\begin{aligned}
+\lim_{n \to \infty} n^{\alpha - \beta} |S_1| 
+&< \lim_{m \to \infty} m^{2\alpha - 2\beta} \cdot m^{S + o(1)} \\
+&= \lim_{m \to \infty} m^{2\alpha - 2\beta + S + o(1)} \\
+&= \lim_{m \to \infty} m^{-0.002733 + o(1)} \\
+&= 0.
+\end{aligned}
+\]
+
+\begin{theorem}
+    任意の$s$に対して，コストが$\frac{n}{\pi} + o(n^{0.83})$である$\mathrm{MEB}[G_{m,m}^{2}]$問題の解が存在する．ここで，$n = m^2$である．
+\end{theorem}
+
+\section{$(k,l)$-格子型ネットワークにおけるMEB問題}
+\subsection{最適解のコストの上界}
+
+\begin{theorem}
+    任意の$s$に対して，コストが$\frac{n}{3} + k + \frac{1}{3} - 1$である$\mathrm{MEB}[G_{k,l}^{\alpha}]$問題の解が存在する．ここで，$n = kl$である．
+\end{theorem}
+
+\subsection{最適解のコストの下界}
+\begin{lemma}
+    $k \leq 10$に対して，$G_{(k,j)}^2$上の1点を中心する任意の半径$r \geq 1$の円に含まれる格子点の数を$N(r)$とする．この時，$N(r) \leq 2kr + k$. また，$r \ge 7$に対して$N(r) \leq 3r^2 + 2\sqrt{2}r - 5$．
+\end{lemma}
+
+\begin{theorem}
+    $k \leq 10$に対して，任意の$\mathrm{MEB}[G_{k,l}^{\alpha}]$問題の解のコストは少なくとも$\frac{n}{3} - O(\sqrt{n})$である．ここで，$n = kl$である．
+\end{theorem}
+
+\phantomsection
+\nocite{*}
+\addcontentsline{toc}{section}{参考文献}
+\printbibliography[title=参考文献]
 \end{document}

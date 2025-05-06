@@ -20,6 +20,10 @@ env:
   # 生成するファイルの名前。
   ARTIFACT_NAME: main.pdf
 
+# GitHub Tokenに必要な権限を付与
+permissions:
+  contents: write
+
 # 実行されるジョブの定義
 jobs:
   # PDFのビルドジョブ

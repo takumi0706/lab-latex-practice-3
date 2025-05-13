@@ -203,7 +203,7 @@
 \renewcommand*{\mkbibnamegiven}[1]{\textup{#1}}
 
 % タイトルのフォーマット（普通のフォントに）
-\DeclareFieldFormat[article,inbook,incollection,inproceedings,patent,thesis,unpublished]{title}{#1}
+\DeclareFieldFormat[article,inbook,incollection,inproceedings]{title}{#1}
 
 % ジャーナル名をイタリックに
 \DeclareFieldFormat{journaltitle}{\textit{#1}}
@@ -213,12 +213,10 @@
 \setlength{\bibparsep}{0pt}
 
 % ボリュームに「Vol.」を追加
-\DeclareFieldFormat[article,periodical]{volume}{Vol.~#1}
+\DeclareFieldFormat[article,inbook,incollection,inproceedings]{volume}{Vol.~#1}
 
 % ナンバーに「No.」を追加
-\DeclareFieldFormat[article,periodical]{number}{No.~#1}
-
-% 参考文献の句読点スタイルを調整
+\DeclareFieldFormat[article,inbook,incollection,inproceedings]{number}{No.~#1}
 
 % 基本の区切り文字をドット+スペースに設定
 \renewcommand*{\newunitpunct}{.\space}
@@ -247,3 +245,161 @@
 \AtEveryBibitem{%
   \csappto{blx@bbx@\thefield{entrytype}}{\setunit{，\space}}%
 }
+
+% 発行年を最後に移動するための設定
+\renewbibmacro*{date+extrayear}{%
+  % 年を出力しないようにする（後で最後に表示する）
+}
+
+% 著者名の後の発行年を削除
+\renewbibmacro*{author/translator+others}{%
+  \usebibmacro{author}%
+  \setunit{\printdelim{authortypedelim}}%
+  \usebibmacro{bytranslator+others}%
+  % 著者名の後の年表示をスキップ
+}
+
+% 記事(article)用のドライバーを修正
+\DeclareBibliographyDriver{article}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{author/translator+others}%
+  \setunit{\labelnamepunct}\newblock
+  \usebibmacro{title}%
+  \newunit
+  \printlist{language}%
+  \newunit\newblock
+  \usebibmacro{byauthor}%
+  \newunit\newblock
+  \usebibmacro{bytranslator+others}%
+  \newunit\newblock
+  \printfield{version}%
+  \newunit\newblock
+  \usebibmacro{journal+issuetitle}%
+  \newunit
+  \usebibmacro{byeditor+others}%
+  \newunit
+  \usebibmacro{note+pages}%
+  \newunit\newblock
+  \iftoggle{bbx:isbn}
+    {\printfield{issn}}
+    {}%
+  \newunit\newblock
+  \usebibmacro{doi+eprint+url}%
+  \newunit\newblock
+  \setunit{\addcomma\space}% 年の前にカンマとスペースを追加
+  \printfield{year}% 最後に年を表示
+  \newunit\newblock
+  \usebibmacro{addendum+pubstate}%
+  \setunit{\bibpagerefpunct}\newblock
+  \usebibmacro{pageref}%
+  \newunit\newblock
+  \iftoggle{bbx:related}
+    {\usebibmacro{related:init}%
+     \usebibmacro{related}}
+    {}%
+  \usebibmacro{finentry}%
+}
+
+% 他の文献タイプも同様に修正（book, incollection, inproceedings など）
+\DeclareBibliographyDriver{inproceedings}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{author/editor+others/translator+others}%
+  \setunit{\labelnamepunct}\newblock
+  \usebibmacro{maintitle+title}%
+  \newunit
+  \printlist{language}%
+  \newunit\newblock
+  \usebibmacro{byauthor}%
+  \newunit\newblock
+  \usebibmacro{byeditor+others}%
+  \newunit\newblock
+  \printfield{edition}%
+  \newunit
+  \printfield{volumes}%
+  \newunit\newblock
+  \usebibmacro{series+number}%
+  \newunit\newblock
+  \printfield{note}%
+  \newunit\newblock
+  \usebibmacro{publisher+location+date}%
+  \newunit\newblock
+  \usebibmacro{chapter+pages}%
+  \newunit
+  \printfield{pagetotal}%
+  \newunit\newblock
+  \iftoggle{bbx:isbn}
+    {\printfield{isbn}}
+    {}%
+  \newunit\newblock
+  \usebibmacro{doi+eprint+url}%
+  \newunit\newblock
+  \setunit{\addcomma\space}% 年の前にカンマとスペースを追加
+  \printfield{year}% 最後に年を表示
+  \newunit\newblock
+  \usebibmacro{addendum+pubstate}%
+  \setunit{\bibpagerefpunct}\newblock
+  \usebibmacro{pageref}%
+  \newunit\newblock
+  \iftoggle{bbx:related}
+    {\usebibmacro{related:init}%
+     \usebibmacro{related}}
+    {}%
+  \usebibmacro{finentry}%
+}
+
+% 出版社と場所のマクロを修正（年を除く）
+\renewbibmacro*{publisher+location+date}{%
+  \printlist{publisher}%
+  \setunit*{\addcomma\space}%
+  \printlist{location}%
+  \newunit
+}
+
+% labelyearの出力を無効化
+\AtEveryBibitem{%
+  \clearfield{labelyear}%
+  \clearfield{labelmonth}%
+}
+
+% date+extrayear マクロを空にする
+\renewbibmacro*{date+extrayear}{}
+
+% articleの問題を解決するため、issue+dateマクロを修正
+\renewbibmacro*{issue+date}{%
+  \printfield{issue}%
+  % ここで日付表示を削除
+  \newunit
+}
+
+% volume+number+eidマクロも修正して年を表示しない
+\renewbibmacro*{volume+number+eid}{%
+  \printfield{volume}%
+  \setunit*{\addspace}%
+  \printfield{number}%
+  \setunit{\addcomma\space}%
+  \printfield{eid}%
+}
+
+% journal+issuetitleマクロのさらなる修正
+\renewbibmacro*{journal+issuetitle}{%
+  \usebibmacro{journal}%
+  \setunit*{，\space}% ジャーナル名の後は読点
+  \iffieldundef{series}
+    {}
+    {\newunit
+     \printfield{series}%
+     \setunit{\addspace}}%
+  \usebibmacro{volume+number+eid}%
+  \setunit{，\space}% 巻・号の後は読点
+  \iffieldundef{issue}
+    {}
+    {\printfield{issue}%
+     \setunit{\addcolon\space}}%
+  % ここでは年を出力しない
+  \newunit
+}
+
+% ボリュームに「Vol.」を追加し、後ろにカンマとスペースを入れる
+\DeclareFieldFormat[article,inproceedings]{volume}{Vol.~#1\addcomma\space}
